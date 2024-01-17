@@ -89,34 +89,45 @@ trait Themes
         }
       }
 
-      if (isset($this->resources) && is_callable([$this, 'add_resource_paths']))
-      { // The 'resources' trait has been loaded, let's check for things to set up.
+      if (is_callable([$this, 'add_resource_paths']))
+      { // The 'Resources' trait has been loaded, let's check for things to set up.
         $localopts = isset($opts['localopts']) ? $opts['localopts'] : [];
+
+        $dpos = $themeDef['add_at_pos'] 
+          ?? $localopts['add_at_pos'] 
+          ?? $opts['add_at_pos'] 
+          ?? 0;
 
         if (isset($themeDef['add_css_path']))
         { // Add CSS paths from theme.
-          $this->add_resource_paths('css', $themeDef['add_css_path']);
+          $pos = $themeDef['add_css_at_pos'] ?? $dpos;
+          $this->add_resource_paths('css', $themeDef['add_css_path'], $pos);
         }
         if (isset($localopts['add_css_path']))
         { // Add CSS paths from generic localopts.
-          $this->add_resource_paths('css', $localopts['add_css_path']);
+          $pos = $localopts['add_css_at_pos'] ?? $dpos;
+          $this->add_resource_paths('css', $localopts['add_css_path'], $pos);
         }
         if (isset($localopts[$themeName], $localopts[$themeName]['add_css_path']))
         { // Add CSS paths from localopts specific to the theme.
-          $this->add_resource_paths('css', $localopts[$themeName]['add_css_path']);
+          $pos = $localopts[$themeName]['add_css_at_pos'] ?? $dpos;
+          $this->add_resource_paths('css', $localopts[$themeName]['add_css_path'], $pos);
         }
 
         if (isset($themeDef['add_js_path']))
         { // Add JS paths from theme.
-          $this->add_resource_paths('js', $themeDef['add_js_path']);
+          $pos = $themeDef['add_js_at_pos'] ?? $dpos;
+          $this->add_resource_paths('js', $themeDef['add_js_path'], $pos);
         }
         if (isset($localopts['add_js_path']))
         { // Add JS paths from generic localopts.
-          $this->add_resource_paths('js', $localopts['add_js_path']);
+          $pos = $localopts['add_js_at_pos'] ?? $dpos;
+          $this->add_resource_paths('js', $localopts['add_js_path'], $pos);
         }
         if (isset($localopts[$themeName], $localopts[$themeName]['add_js_path']))
-        { // Add JS paths from localopts specific to the theme. 
-          $this->add_resource_paths('js', $localopts[$themeName]['add_js_path']);
+        { // Add JS paths from localopts specific to the theme.
+          $pos = $localopts[$themeName]['add_js_at_pos'] ?? $dpos;
+          $this->add_resource_paths('js', $localopts[$themeName]['add_js_path'], $pos);
         }
 
         if (isset($themeDef['add_css']))

@@ -103,7 +103,7 @@ trait Auth
       foreach ($conf['authPlugins'] as $plugname => $plugconf)
       {
         if ($plugconf === false) continue; // skip disabled plugins.
-        $classname = "\\Lum\\Controllers\\Auth\\$plugname";
+        $classname = "\\Lum\\Controllers\\Does\\Auth\\$plugname";
         $plugin = new $classname(['parent'=>$this]);
         $options = $plugin->options($plugconf);
         $plugopts = ['context'=>$context];

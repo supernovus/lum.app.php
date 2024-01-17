@@ -1,0 +1,57 @@
+{
+  "js":
+  {
+    "path": ["scripts", "scripts/nano", "scripts/ext"],
+    "groups":
+    {
+      "#common":
+      [
+        "jquery",
+        "core",
+        "helpers",
+        "hash",
+        "json.jq",
+        "disabled.jq",
+        "exists.jq"
+      ],
+      "#webcore":
+      [
+        "#common",
+        "oquery",
+        "modelapi",
+        "viewcontroller"
+      ],
+      "#webcore_ws":
+      [
+        "#webcore",
+        "webservice",
+        "promise",
+        "modelapi/ws_model"
+      ],
+      "#base64":
+      [
+        "crypto/components/core-min",
+        "crypto/components/enc-base64-min"
+      ],
+      "#ace":
+      [
+        "ace/src-min-noconflict/ace"
+      ],
+      "#editor":
+      [
+        "#common",
+        "#ace",
+        "#base64",
+        "editor"
+      ]
+    },
+    "urls":
+    {
+      "@google_charts": "https://www.gstatic.com/charts/loader.js"
+    }
+  },
+  "css":
+  {
+    "path":  ["style"]
+  }
+}
