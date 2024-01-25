@@ -32,6 +32,7 @@ trait Notifications
 
   protected function __init_notifications_controller ($opts)
   {
+    #error_log("__init_notifications_controller()");
     $notifications = \Lum\UI\Notifications::getInstance(
     [
       'parent' => $this,

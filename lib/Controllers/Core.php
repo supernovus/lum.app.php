@@ -152,8 +152,8 @@ abstract class Core
   /**
    * Initialize the Routing information.
    *
-   * Called by the \Lum\Plugins\Router object ($core->router) when it
-   * loads a controller before calling the handler method.
+   * Called by a \Lum\Router instace when it loads a controller before 
+   * calling the handler method.
    *
    * Like the __construct() method this can call a bunch of 
    * __init_*_controller() methods.

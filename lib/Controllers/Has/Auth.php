@@ -6,6 +6,9 @@ namespace Lum\Controllers\Has;
  * A Controller Trait for Authentication and Authorization.
  *
  * This needs the ModelConf trait.
+ * 
+ * TODO: Move a lot of this into the `lum-auth` package.
+ *       Leave compatibility methods for the time being.
  */
 trait Auth
 {
@@ -19,7 +22,7 @@ trait Auth
 
   protected function __init_auth_controller ($opts)
   {
-    // We want to make sure messages is loaded first.
+    // We want to make sure notifications is loaded first.
     $this->needs('messages');
 
     // If Auth\Users trait is available, load it first.
@@ -36,7 +39,7 @@ trait Auth
       if (!is_string($auth_config))
         $auth_config = 'auth';
 //      error_log("using auth_config '$auth_config'");
-      $auth_config = $core->conf->$auth_config;
+      $auth_config = $core->conf[$auth_config];
 //      error_log("auth config contents: ".json_encode($auth_config));
     }
 
@@ -103,7 +106,7 @@ trait Auth
       foreach ($conf['authPlugins'] as $plugname => $plugconf)
       {
         if ($plugconf === false) continue; // skip disabled plugins.
-        $classname = "\\Lum\\Controllers\\Does\\Auth\\$plugname";
+        $classname = "\\Lum\\Auth\\Plugins\\$plugname";
         $plugin = new $classname(['parent'=>$this]);
         $options = $plugin->options($plugconf);
         $plugopts = ['context'=>$context];

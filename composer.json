@@ -14,7 +14,10 @@
   {
     "lum/lum-compat": "^2.6",
     "lum/lum-core": "^3.0",
-    "lum/lum-core-plugins": "^1.0",
+    "lum/lum-plugins-conf": "^1.0",
+    "lum/lum-plugins-router": "^1.0",
+    "lum/lum-plugins-web": "^1.0",
+    "lum/lum-auth": "^1.0",
     "lum/lum-html": "^2.0",
     "lum/lum-uimsg": "^2.0",
     "lum/lum-text": "^2.0"
