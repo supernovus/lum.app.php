@@ -2,7 +2,7 @@
 
 namespace TestApp\Controllers;
 
-class Example extends \Lum\Controllers\Basic
+class Example extends \Lum\Controllers\Core
 {
   protected $layout = 'default';
   public function handle_default ($context)

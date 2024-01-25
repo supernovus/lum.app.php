@@ -8,6 +8,7 @@ $t = new \Lum\Test();
 
 $t->plan(4);
 
+$_SERVER['REMOTE_ADDR']    = '127.0.0.1';
 $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['REQUEST_URI']    = '/';
 $_SERVER['CONTENT_TYPE']   = 'text/plain';
