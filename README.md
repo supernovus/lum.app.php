@@ -16,11 +16,24 @@ Database-specific model classes are in their own packages:
  * [PDO/SQL](https://github.com/supernovus/lum.app-pdo.php)
  * [MongoDB](https://github.com/supernovus/lum.app-mongo.php)
 
-## TODO
+## TODO: Auth changes!
 
-I am planning to split more of the `Lum\Controllers\Has\Auth` code into
-new classes/traits in the [lum-auth] package, as that package is expanded
-to support new forms of auth including passkeys and a few MFA options.
+Currently a lot of logic for authentication is implemented in the
+`Lum\Controllers\Has\Auth`, `Lum\Controllers\For\User*`, and
+various `Lum\Models\*` classes and traits. That is going to change.
+The majority of actual authentication code will be moved into the
+[lum-auth] package, which will be modularlized further and have
+a new API that is cleaner and easier to extend (features such as
+MFA and Passkeys will be added to the new version.)
+
+The existing traits and classes will still exist, with their existing
+API methods, but they'll be using the new `lum-auth` APIs instead of
+implementing the functionality themselves. Several of the methods
+in `Lum\Controllers\Has\Auth` will be marked as deprecated for
+all future versions of the `1.x` releases, and will be removed entirely
+from the next major (`2.0`) release. Some of the other traits and
+classes may also have deprecated APIs, the docs will be updated
+accordingly once the refactoring has been done.
 
 ## Official URLs
 

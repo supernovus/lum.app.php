@@ -2,7 +2,7 @@
 
 namespace Lum\Models\Common;
 
-use \Lum\Controllers\Basic as LumCtrl;
+use \Lum\Controllers\Core as LumCtrl;
 
 /**
  * An abstract base class for Plugins.

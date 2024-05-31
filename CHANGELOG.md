@@ -6,8 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2024-05-31
 ### Fixed
+- Fixed `Models\Common\Plugin` to use `Controller\Core`.
 - Updated test to work with new changes.
+### Changed
+- Updated README in regards to the upcoming _auth_ API changes.
 
 ## [1.0.0] - 2024-01-25
 ### Added
@@ -20,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All DB-specific `Models` are in their own packages now.
 - Auth plugins are in the `lum-auth` package now.
 
-[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/supernovus/lum.app.php/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/supernovus/lum.app.php/releases/tag/v1.0.0
 
