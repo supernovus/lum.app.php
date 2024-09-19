@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-09-19
+### Fixed
+- A syntax error in `Common/Auth_Token`
+### Changed
+- `get_auth()` logging preference is in a property now.
+
 ## [1.0.1] - 2024-05-31
 ### Fixed
 - Fixed `Models\Common\Plugin` to use `Controller\Core`.
@@ -24,7 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All DB-specific `Models` are in their own packages now.
 - Auth plugins are in the `lum-auth` package now.
 
-[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/supernovus/lum.app.php/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/supernovus/lum.app.php/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/supernovus/lum.app.php/releases/tag/v1.0.0
 

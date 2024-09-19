@@ -20,6 +20,8 @@ trait Auth
 
   public $interactive = false; // A user is accessing from a browser.
 
+  public $log_no_auth = false; // Used by get_auth()
+
   protected function __init_auth_controller ($opts)
   {
     // We want to make sure notifications is loaded first.
@@ -80,7 +82,7 @@ trait Auth
 
     $skipUsers = isset($aopts['skipUsers']) ? $aopts['skipUsers'] : false;
     $interactive = isset($aopts['interactive']) ? $aopts['interactive'] : true;
-    $logNone = isset($aopts['log']) ? $aopts['log'] : true;
+    $logNone = isset($aopts['log']) ? $aopts['log'] : $this->log_no_auth;
 
     if (isset($conf['userAccess']) && $conf['userAccess'] && !$skipUsers)
     {

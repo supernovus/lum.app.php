@@ -52,7 +52,7 @@ trait Auth_Token
     if (!isset($user)) return; // invalid user.
     $tfield = $this->user_token;
     $kfield = $this->parent->key_field;
-    return hash($this->parent->hashType, trim($this->$kfield, $user->$tfield));
+    return hash($this->parent->hashType, trim($this->$kfield . $user->$tfield));
   }
 
   /**
