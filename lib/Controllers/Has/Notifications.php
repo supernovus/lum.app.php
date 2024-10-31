@@ -41,6 +41,12 @@ trait Notifications
 
     $this->notifications = $notifications;
     $this->data['notifications'] = $notifications;
+
+    if (is_callable([$this, 'addWrapper']))
+    {
+      // And a wrapper to our has_errors() method.
+      $this->addWrapper('has_errors');
+    }
   }
 
   public function get_notifications ()

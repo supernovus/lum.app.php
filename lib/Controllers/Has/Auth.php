@@ -5,10 +5,13 @@ namespace Lum\Controllers\Has;
 /**
  * A Controller Trait for Authentication and Authorization.
  *
- * This needs the ModelConf trait.
+ * This needs the 'ModelConf' and 'Notifications' traits.
  * 
- * TODO: Move a lot of this into the `lum-auth` package.
- *       Leave compatibility methods for the time being.
+ * TODO: 
+ * - Move a lot of this into the `lum-auth` package.
+ *   Leave compatibility methods for the time being.
+ * - Make Notifications/Messages traits optional.
+ *
  */
 trait Auth
 {
@@ -87,6 +90,7 @@ trait Auth
     if (isset($conf['userAccess']) && $conf['userAccess'] && !$skipUsers)
     {
       $user = $this->get_user(true);
+      #error_log("user = ".serialize($user));
       if ($user)
       {
         $valid = true;
@@ -189,6 +193,7 @@ trait Auth
       $users_model = $this->get_prop('users_model', 'users');
       $users = $this->model($users_model);
       $auth = $users->get_auth(true);
+      #error_log("@auth = ".serialize($auth));
       $userid = $auth->is_user();
       if ($userid)
       {

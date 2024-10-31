@@ -96,12 +96,6 @@ trait Messages
       $this->data['title'] = $pagetitle;
     }
 
-    if (is_callable([$this, 'addWrapper']))
-    {
-      // And a wrapper to our has_errors() method.
-      $this->addWrapper('has_errors');
-    }
-
   }
 
   // Return our translation object.

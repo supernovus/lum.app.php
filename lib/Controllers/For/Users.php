@@ -171,7 +171,8 @@ trait Users
     }
 
     $login_page = $this->get_prop('login_page', 'login');
-    $this->go($login_page);
+    $after_logout = $this->get_prop('after_logout', $login_page);
+    $this->go($after_logout);
   }
 
   // Get the validation code.
