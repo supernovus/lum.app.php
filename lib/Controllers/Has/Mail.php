@@ -37,24 +37,30 @@ trait Mail
     $core->mail_messages = 'views';
     foreach ($dirs as $dir)
     {
+      /** @disregard P1006 -> mail_messages is NOT a string */
       if (isset($lang))
         $core->mail_messages->addDir($dir . '/' . $lang);
-
+      /** @disregard P1006 */
       $core->mail_messages->addDir($dir);
     }
   }
 
   /**
    * Get a Mailer object.
+   * 
+   * Is now a wrapper of the Lum\App::mailer() static method.
    *
-   * @param (array|null) $fields (Optional) Fields for Mailer.
-   * @param array $opts          (Optional) Options for Mailer.
+   * @param array|null $fields (Optional) Fields for Mailer.
+   * @param array      $opts   (Optional) Options for Mailer.
+   * @return ?object A mailer instance (if class was found).
    */
-  public function mailer ($fields=null, $opts=[])
+  public function mailer (?array $fields=null, array $opts=[])
   {
-    $opts['views'] = 'mail_messages';
-    $mailer = new \Lum\Mailer($fields, $opts);
-    return $mailer;
+    if (isset($fields))
+    {
+      $opts['fields'] = $fields;
+    }
+    return \Lum\App::mailer($opts);
   }
 
 }

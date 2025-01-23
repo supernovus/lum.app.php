@@ -26,6 +26,12 @@
   {
     "lum/lum-test": "^3.1"
   },
+  "suggest":
+  {
+    "lum/lum-app-pdo": "Models for PDO/SQL",
+    "lum/lum-app-mongo": "Models for MongoDB",
+    "lum/lum-mailer": "A mail sending helper"
+  },
   "autoload":
   {
     "psr-4":

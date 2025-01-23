@@ -185,9 +185,11 @@ trait Users
   // Backend method to start the reset process and send an e-mail to the
   // user with the appropriate message. Used to live in the User trait, but
   // I think it's more appropriate to be in here.
-  protected function mail_reset_pw ($user, $template, $subject, $opts=[])
+  protected function mail_reset_pw ($user, $opts=[])
   {
-    $ctrl = $this->parent;
+    // Get our required information.
+    $uid  = $user->get_id();
+    if (!$uid) return null; // No user? Cannot continue
 
     // Pre-email check, if it returns false, we fail.
     // You can populate $opts with extended data if required.
@@ -200,28 +202,47 @@ trait Users
       }
     }
 
-    // Get our required information.
     $core = \Lum\Core::getInstance();
+    $ctrl = $this->parent;
     $code = $user->resetReset();
-    $uid  = $user->get_id();
+
+    $translate = $opts['translate_subject'] ?? true;
+
+    if ($translate)
+    { // Subject uses translation strings.
+      $text = $ctrl->get_text();
+      $subject = $opts['subject'];
+      $subject = $text[$subject];
+      $opts['subject'] = $subject;
+    }
 
     // Set up a validation code to send to the user.
     $validInfo = array('uid'=>$uid, 'code'=>$code);
     $validCode = Safe64::encodeData($validInfo);
 
     // E-mail rules for the Lum mailer.
-    $mail_rules = isset($opts['mail_rules']) ? $opts['mail_rules'] : [];
+    $mail_rules = $opts['fields'] ?? $opts['mail_rules'] ?? [];
     $mail_rules['username'] = true;
     $mail_rules['siteurl']  = true;
     $mail_rules['code']     = true;
 
     // Our mailer options.
-    $mail_opts             = $core->conf->mail;
+    $mail_opts             = $core->conf->mail ?? [];
+    $mail_opts             = array_merge($mail_opts, $opts);
     $mail_opts['views']    = isset($opts['view_loader']) 
       ? $opts['view_loader'] : 'mail_messages';
-    $mail_opts['subject']  = $subject;
     $mail_opts['to']       = $user->email;
-    $mail_opts['template'] = $template;
+    $mail_opts['fields']   = $mail_rules;
+
+    if (isset($mail_opts['template']) && !isset($mail_opts['htmlTemplate']))
+    {
+      $mail_opts['htmlTemplate'] = $mail_opts['template'];
+    }
+
+    if (isset($mail_opts['alt_template']) && !isset($mail_opts['textTemplate']))
+    {
+      $mail_opts['textTemplate'] = $mail_opts['alt_template'];
+    }
 
     if (!isset($mail_opts['handler']))
     { // Look for a handler in the 'email_class' property.
@@ -236,7 +257,7 @@ trait Users
     }
 
     // Build our mailer object.
-    $mailer = new \Lum\Mailer($mail_rules, $mail_opts);
+    $mailer = \Lum\App::mailer($mail_opts);
 
     // The message data for the template.
     $mail_data = isset($opts['mail_data']) ? $opts['mail_data'] : [];
@@ -286,28 +307,17 @@ trait Users
    */
   public function send_forgot_email ($user, $opts=[])
   {
-    if ($user->get_id())
-    { // Make sure we have an id, and are thus a saved user.
-      $template = isset($opts['template']) ? $opts['template'] :
-        'forgot_password';
-      $subject = isset($opts['subject']) ? $opts['subject'] :
-        'subject.forgot';
-
-      if (!isset($opts['translate_subject']) || $opts['translate_subject'])
-      {
-        $text = $this->parent->get_text();
-        $subject = $text[$subject];
-      }
-
-      return $this->mail_reset_pw($user, $template, $subject, $opts);
-    }
+    if (!isset($opts['template'])) $opts['template'] = 'forgot_password';
+    if (!isset($opts['subject']))  $opts['subject']  = 'subject.forgot';
+    return $this->mail_reset_pw($user, $opts);
   }
 
   /**
    * Send an activation email.
    *
    * As the activation emails are pretty much identical to forgot password
-   * ones, this just calls send_forgot_email(), but changes the defaults.
+   * ones, this and send_forgot_email() use the same protected method, 
+   * but with different defaults.
    *
    *  'template'  New default: 'activate_account'
    *  'subject'   New default: 'subject.activate'
@@ -318,7 +328,7 @@ trait Users
   {
     if (!isset($opts['template'])) $opts['template'] = 'activate_account';
     if (!isset($opts['subject']))  $opts['subject']  = 'subject.activate';
-    return $this->send_forgot_email($user, $opts);
+    return $this->mail_reset_pw($user, $opts);
   }
 
 }
