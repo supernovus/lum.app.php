@@ -242,7 +242,7 @@ class App
       return $rtr->route();
     };
 
-    return (object)['core' => $core, 'router'=>$rtr, 'go'=>$go];
+    return (object)['core'=>$core, 'router'=>$rtr, 'go'=>$go];
   }
 
   /**
@@ -253,9 +253,10 @@ class App
    *
    * @param array $opts Options for mailer
    * 
-   * Explicitly will check for the 'fields' option if
-   * version 2.x or older is found, as that version included
-   * the fields as a separate constructor argument.
+   * Will get defaults from `$core->conf->mail` if it is set.
+   * 
+   * If lum-mailer 2.x or older is being used, will extract the 'fields'
+   * option (if set) to be passed as a separate argument.
    * 
    * @return ?object A mailer instance if a class was found,
    * or null otherwise.
@@ -266,17 +267,21 @@ class App
     {
       $opts['views'] = 'mail_messages';
     }
+
+    $core = \Lum\Core::getInstance();
+    $mail_opts = $core->conf->mail ?? [];
+    $mail_opts = array_merge($mail_opts, $opts);
     
     if (class_exists('\\Lum\\Mailer\\Manager'))
     { // Mailer v3.x or newer
       /** @disregard P1009 */
-      $mailer = new \Lum\Mailer\Manager($opts);
+      $mailer = new \Lum\Mailer\Manager($mail_opts);
     }
     elseif (class_exists('\\Lum\\Mailer'))
     { // Mailer v2.x or older
-      $fields = $opts['fields'] ?? null;
+      $fields = $mail_opts['fields'] ?? null;
       /** @disregard P1009 */
-      $mailer = new \Lum\Mailer($fields, $opts);
+      $mailer = new \Lum\Mailer($fields, $mail_opts);
     }
     else
     {

@@ -4,6 +4,12 @@ namespace Lum\Models\Common;
 
 use Lum\Encode\Safe64;
 
+/*
+ * TODO: 
+ * - send_*_email() need to support 'htmlTemplate' and 'textTemplate'
+ * - getting $core->conf->mail defaults should be moved to App::mailer()
+ */
+
 trait Users
 {
   abstract public function getUser ($identifier, $fieldname=null);
@@ -202,7 +208,6 @@ trait Users
       }
     }
 
-    $core = \Lum\Core::getInstance();
     $ctrl = $this->parent;
     $code = $user->resetReset();
 
@@ -227,8 +232,7 @@ trait Users
     $mail_rules['code']     = true;
 
     // Our mailer options.
-    $mail_opts             = $core->conf->mail ?? [];
-    $mail_opts             = array_merge($mail_opts, $opts);
+    $mail_opts             = $opts['mail_opts'] ?? $opts;
     $mail_opts['views']    = isset($opts['view_loader']) 
       ? $opts['view_loader'] : 'mail_messages';
     $mail_opts['to']       = $user->email;
