@@ -61,7 +61,6 @@ class App
   public static function init(array $opts=[])
   {
     $opts = array_merge(static::DEFAULT_INIT, $opts);
-    $root = $opts['rootPrefix'] ?? '';
     $core = Core::getInstance($opts);
 
     if ($core[self::APP_INITED])
@@ -69,6 +68,7 @@ class App
       return $core;
     }
 
+    $root = $opts['rootPrefix'] ?? '';
     $core->conf->setDir($root.$opts['confroot']);
 
     $useDebug = $opts['dbgCore'] ?? $opts['debug'] ?? false;
@@ -168,7 +168,10 @@ class App
    * 
    * @return \Lum\Core
    */
-  public static function setupNamespaces(string $nsp, array $no=[], array $io=[])
+  public static function setupNamespaces(
+    string $nsp, 
+    array $no=[], 
+    array $io=[])
   {
     $core = static::init($io);
 
@@ -237,10 +240,7 @@ class App
 
     $core = static::setupNamespaces($nsp, $no, $io);
     $rtr  = static::router($ro); // no need to pass $io
-    $go   = function() use ($rtr)
-    { // Start the routing process.
-      return $rtr->route();
-    };
+    $go   = fn() => $rtr->route();
 
     return (object)['core'=>$core, 'router'=>$rtr, 'go'=>$go];
   }

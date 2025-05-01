@@ -223,7 +223,7 @@ abstract class Core
    * If we use a layout, then the contents of the screen will be available
    * in a variable determined by the $screen_layout_name property.
    */
-  public function display ($opts=array())
+  public function display ($opts=[])
   {
     // Get Lum.
     $core = \Lum\Core::getInstance();
@@ -244,7 +244,7 @@ abstract class Core
 
     // Allow for some preparation code before rendering the page.
     if (is_callable([$this, 'pre_render_page']))
-    {
+    { /** @disregard P1013 */
       $this->pre_render_page($screen, $layout, $opts);
     }
 
@@ -258,7 +258,7 @@ abstract class Core
 
     // Now for post-page, pre-layout stuff.
     if (is_callable([$this, 'post_render_page']))
-    {
+    { /** @disregard P1013 */
       $this->post_render_page($page, $layout, $opts);
     }
 
@@ -268,7 +268,7 @@ abstract class Core
       $this->data[$varname] = $page;
       $template = $core->layouts->load($layout, $this->data);
       if (is_callable([$this, 'post_render_layout']))
-      {
+      { /** @disregard P1013 */
         $this->post_render_layout($template, $layout, $opts);
       }
       return $template;
@@ -292,7 +292,7 @@ abstract class Core
    * screen view template. If you do not specify a $data array, then the
    * $this->data class member will be used instead.
    */
-  public function send_html ($screen, $data=Null)
+  public function send_html ($screen, $data=null)
   {
     if (is_null($data))
       $data = $this->data;
@@ -304,39 +304,63 @@ abstract class Core
   /** 
    * Return the requested Model object.
    *
-   * @param string $modelname  (Optional) The model to load.
-   * @param array $modelopts   (Optional) Options to pass to model, see below.
-   * @param mixed $loadopts    (Optional) Options specific to this, see below.
+   * @param ?string $modelname  (Recommended) The model to load.
    * 
-   * If the $model is not specified or is Null, then we assume the
-   * model has the same name as the current controller (see `name()` below.)
-   *
+   * As it is using a loader from the `\Lum\Core` class, you can use dotted
+   * names, omitting the App and Models portions of the namespace.
+   * For example, say you wanted the `\MyApp\Models\Examples\Test` model,
+   * you could simple use: 'Examples.Test'. Depending on the autoloader
+   * methods in use, it may be case-insensitive in which case you may be 
+   * able to use 'examples.test' as well.
+   * 
+   * If the $modelname is not specified or is `null`, then we assume the
+   * model has the same name as the current controller (see `name()` below).
+   * 
+   * While making the model name optional was something I used when I wrote 
+   * the original version of this class well over a decade ago, it's not a 
+   * feature I've used in years, and I don't really recommend it anymore.
+   * 
+   * @param array $modelopts   (Optional) Options to pass to model.
+   * 
    * The $modelopts will be added to the parameters used in the class loader
    * (which will in turn be passed to the constructor of the Model class.)
    * If the `ModelConf` trait is loaded, the $modelopts will be passed to it
    * to have anything from the applicable model configuration added to it.
+   * 
+   * @param mixed $loadopts    (Optional) Options for loading and caching.
    *
-   * If the specified $model has been loaded already by this controller,
-   * by default we will return the cached copy, ignoring any new options.
+   * By default models loaded with this method will be cached so that future
+   * calls will return the cached copy. This behaviour can be changed and
+   * customized using the $loadopts parameter.
    *
    * If $loadopts is an array, the options we support are:
    *
-   *   'forceNew'               If set to True, we will always create a new
+   *   'forceNew' (bool)        If set to true, we will always create a new
    *                            instance of the model, even if we've loaded
    *                            it before. If caching is on, it will override
    *                            the previously loaded instance.
    *
-   *  'noCache'                 If set to true, we will not cache the model
+   *  'noCache'   (bool)        If set to true, we will not cache the model
    *                            instance loaded by this call.
+   * 
+   *  'cacheName' (string)      If set this is the name that will be used to
+   *                            cache the model instance. The string literal
+   *                            '%%' will be replaced by $modelname if found.
+   * 
+   *                            If no 'cacheName' is specified, then the
+   *                            $modelname will be used verbatim.
    *
    * If $loadopts is a boolean, then it's a quick alias:
    *
-   *   true       Same as ['forceNew'=>true, 'noCache'=>false]
-   *   false      Same as ['forceNew'=>true, 'noCache'=>true]
+   *   true       Same as ``['forceNew'=>true, 'noCache'=>false]``
+   *   false      Same as ``['forceNew'=>true, 'noCache'=>true]``
+   * 
+   * If $loadopts is a string, it'll be used as the 'cacheName' option.
    *
    * If $loadopts is null or any value other than one of the above, it's the
-   * same as passing ['forceNew'=>false, 'noCache'=>false].
+   * same as passing ``['forceNew'=>false, 'noCache'=>false]``.
    *
+   * @return ?object The model instance
    */
   public function model ($modelname=Null, $modelopts=[], $loadopts=[])
   {
@@ -355,39 +379,88 @@ abstract class Core
     {
       $loadopts = ['forceNew'=>true, 'noCache'=>'true'];
     }
+    elseif (is_string($loadopts))
+    {
+      $loadopts = ['cacheName'=>$loadopts];
+    }
     elseif (!is_array($loadopts))
     {
       $loadopts = [];
     }
 
-    if 
-    (
-      !isset($this->models[$modelname]) ||
-      (isset($loadopts['forceNew']) && $loadopts['forceNew'])
-    )
-    { 
-      // If we have a populate_model_opts() method, call it.
-      if (is_callable([$this, 'populate_model_opts']))
-      {
-        $modelopts = $this->populate_model_opts($modelname, $modelopts);
-      }
+    $forceNew  = $loadopts['forceNew'] ?? false;
+    $noCache   = $loadopts['noCache']  ?? false;
+    $cachename = isset($loadopts['cacheName']) 
+      ? str_replace('%%', $modelname, $loadopts['cacheName'])
+      : $modelname;
 
-      // Set our parent object.
-      $modelopts['parent'] = $this;
-
-      // Load the model instance.
-      $instance = $core->models->load($modelname, $modelopts);
-
-      // Cache the results.
-      if (!isset($loadopts['noCache']) || !$loadopts['noCache'])
-      {
-        $this->models[$modelname] = $instance;
-      }
-
-      return $instance;
+    if (!$forceNew && isset($this->models[$cachename]))
+    { // Cached copy found
+      return $this->models[$cachename];
     }
 
-    return $this->models[$modelname];
+    // If we have a populate_model_opts() method, call it.
+    if (is_callable([$this, 'populate_model_opts']))
+    { /** @disregard P1013 */
+      $modelopts = $this->populate_model_opts($modelname, $modelopts);
+    }
+
+    // Set our parent object.
+    $modelopts['parent'] = $this;
+
+    // Load the model instance.
+    $instance = $core->models->load($modelname, $modelopts);
+
+    if (!$noCache)
+    { // Cache the results.
+      $this->models[$modelname] = $instance;
+    }
+
+    return $instance;
+  }
+
+  /**
+   * This is a customized wrapper around the model() method designed
+   * for special model classes which may have multiple instances, 
+   * each representing a different underlying database table.
+   * 
+   * @param ?string $modelname  (Mandatory) See model() for details.
+   * @param string $tablename   (Mandatory) The database table to use.
+   * @param array $modelopts    (Optional)  See model() for details.
+   *                           
+   * This will have an option added to it with the $tablename as the value.
+   * You can choose the option name by setting `$loadopts['tableOpt']`.
+   * 
+   * @param array $loadopts     (Optional)  See model() for details.
+   * 
+   * Unlike the argument in model(), this method **ONLY** allows
+   * the $loadopts to be specified as an associative array!
+   * 
+   * You cannot manually specify the 'cacheName' option with this method.
+   * The 'cacheName' option will be set automatically to an explicit value
+   * of "%%:$tablename", which will be expanded to "$modelname:$tablename"
+   * by the model() method. That ensures that future calls to this method
+   * with the same $modelname and $tablename will return the cached instance.
+   * 
+   * One additional option specific to this method is added here:
+   * 
+   *   'tableOpt' (string)      The option key/name to add to $modelopts.
+   * 
+   * The default 'tableOpt' value is 'table'. Chosen since both \Lum\DB\PDO
+   * and \Lum\DB\Mongo support a 'table' named constructor parameter.
+   *
+   * @return ?object
+   */
+  public function tableModel(
+    ?string $modelname, 
+    string $tablename,
+    array $mo=[],
+    array $lo=[]) : ?object
+  {
+    $to = $lo['tableOpt'] ?? 'table';
+    $mo[$to] = $tablename;
+    $lo['cacheName'] = "%%:$tablename";
+    return $this->model($modelname, $mo, $lo);
   }
 
   /**
@@ -396,8 +469,10 @@ abstract class Core
   public function loadController (string $name, array $opts=[])
   {
     $core = \Lum\Core::getInstance();
+    /** @disregard P1014 */
     if (property_exists($this, 'user') && is_object($this->user))
     { // We're using the Auth trait, let's chain the user through.
+      /** @disregard P1014 */
       $opts['user'] = $this->user;
     }
     return $core->controllers->load($name, $opts);

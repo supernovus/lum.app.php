@@ -6,13 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - 2025-01-?? (TBD)
+## [1.2.0] - 2025-05-01
 ### Added
 - New `Lum\App` static class with methods for making
   common app bootstrap processes simpler.
+- A new `\Lum\Controllers\Core::tableModel()` method that is a wrapper
+  around the model() method (which also got a revamp, see below).
 ### Changed
 - Added support for `lum-mailer` version `3.x` which is a rewrite
   that breaks compatibility with the older versions.
+- Moved the `has_errors` wrapper from Messages to Notifications,
+  as that is where it was supposed to be put when those two were
+  split up. Whoops!
+- Made some big enhancements to the `Controllers\Core::model()` method.
+  It can name have a different name for cached instances than the
+  underlying model name. This will be useful for when a single model class 
+  may have multiple instances with different datasets.
+- Some minor reformatting and adding `/** @disregard */` rules.
 
 ## [1.1.0] - 2024-09-19
 ### Fixed
@@ -22,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2024-05-31
 ### Fixed
-- Fixed `Models\Common\Plugin` to use `Controller\Core`.
+- Fixed `Models\Common\Plugin` to use `Controllers\Core`.
 - Updated test to work with new changes.
 ### Changed
 - Updated README in regards to the upcoming _auth_ API changes.
