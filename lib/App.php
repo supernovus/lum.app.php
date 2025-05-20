@@ -31,6 +31,9 @@ class App
     'confroot'  => 'conf',
   ];
 
+  /**
+   * Default options for router() method.
+   */
   const DEFAULT_ROUTER =
   [
     'conf' => 'routes',
@@ -61,6 +64,16 @@ class App
   public static function init(array $opts=[])
   {
     $opts = array_merge(static::DEFAULT_INIT, $opts);
+    $root = $opts['rootPrefix'] ?? '';
+    if ($root)
+    {
+      foreach (array_keys(static::DEFAULT_INIT) as $key)
+      {
+        $path = $opts[$key];
+        $opts[$key] = $root.$path;
+      }
+    }
+
     $core = Core::getInstance($opts);
 
     if ($core[self::APP_INITED])
@@ -68,9 +81,7 @@ class App
       return $core;
     }
 
-    $root = $opts['rootPrefix'] ?? '';
-    $core->conf->setDir($root.$opts['confroot']);
-
+    $core->conf->setDir($opts['confroot']);
     $useDebug = $opts['dbgCore'] ?? $opts['debug'] ?? false;
     if ($useDebug === true)
     { // Old debug file name
@@ -115,10 +126,9 @@ class App
     { // Initialize the core router object.
       $ro = array_merge(static::DEFAULT_ROUTER, $ro);
       $core->router = $ro;
-      $rtr = $core->router;
       /** @var Lum\Plugins\Router $rtr */
+      $rtr = $core->router;
       $useDebug = $ro['debug'] ?? $io['dbgRouter'] ?? false;
-      $root = $conf['rootPrefix'] ?? '';
       if ($useDebug === true)
       {
         try
@@ -133,6 +143,7 @@ class App
       }
       elseif (is_string($useDebug))
       {
+        $root = $io['rootPrefix'] ?? $ro['rootPrefix'] ?? '';
         $rtr->loadDebugConf($root.$useDebug);
       }
 

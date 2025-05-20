@@ -362,7 +362,10 @@ abstract class Core
    *
    * @return ?object The model instance
    */
-  public function model ($modelname=Null, $modelopts=[], $loadopts=[])
+  public function model (
+    $modelname=Null, 
+    $modelopts=[], 
+    $loadopts=[])
   {
     $core = \Lum\Core::getInstance();
 
@@ -399,10 +402,27 @@ abstract class Core
       return $this->models[$cachename];
     }
 
+    $pops = [];
+    foreach (['defaults','common','more'] as $pop)
+    {
+      if (isset($loadopts[$pop]))
+      {
+        $pops[$pop] = $loadopts[$pop];
+      }
+    }
+    if ($cachename !== $modelname)
+    {
+      if (!isset($pops['more']))
+      {
+        $pops['more'] = [];
+      }
+      $pops['more'][] = $cachename;
+    }
+
     // If we have a populate_model_opts() method, call it.
     if (is_callable([$this, 'populate_model_opts']))
     { /** @disregard P1013 */
-      $modelopts = $this->populate_model_opts($modelname, $modelopts);
+      $modelopts = $this->populate_model_opts($modelname, $modelopts, $pops);
     }
 
     // Set our parent object.
