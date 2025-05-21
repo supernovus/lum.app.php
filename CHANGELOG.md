@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-05-20
+### Fixed
+- The `Lum\App` static class actually works properly now.
+### Changed
+- A few more tweaks to the `Lum\Controllers\Core::model()` method,
+  and `Lum\Controllers\Has\Models` trait.
+
 ## [1.2.0] - 2025-05-01
 ### Added
 - New `Lum\App` static class with methods for making
@@ -48,7 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All DB-specific `Models` are in their own packages now.
 - Auth plugins are in the `lum-auth` package now.
 
-[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/supernovus/lum.app.php/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/supernovus/lum.app.php/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/supernovus/lum.app.php/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/supernovus/lum.app.php/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/supernovus/lum.app.php/compare/v1.0.0...v1.0.1
